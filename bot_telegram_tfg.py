@@ -6,7 +6,7 @@ from telegram import Bot
 
 import logging
 
- 
+from configparser import ConfigParser
 
 # Configuração do logging para depuração
 
@@ -14,63 +14,79 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 
 logger = logging.getLogger(__name__)
 
- 
+def get_data():
+    try:
+        
+        logger.info("iniciando - get_data()")
+        file = 'config.ini.txt'
+        config = ConfigParser()
+        config.read(file)
 
-# Token do seu Bot do Telegram
+        logger.info(config.sections())
 
-TOKEN = '7346286604:AAF0_pC-radfTKxTvvufc4_IKs5IhMaFMQs'
+        return config
+    
+    except Error as e:
+        
+        logger.error(f"Erro na busca aos dados config.ini.txt :{e}")
 
+        return None
  
 
 # Função para conectar ao banco de dados MySQL
 
-def mysql_connection(host, user, passwd, database=None):
-
+def mysql_connection(config):#host, user, passwd, database=None):
+    logger.info("iniciando - mysql_connection")
     try:
 
-        conn = connect(
+            conn = connect(
 
-            host=host,
+                host=config["conn_bd"]["host"],
+                
+                user=config["conn_bd"]["user"],
+                    
+                passwd=config["conn_bd"]["passwd"],
+                    
+                database=config["conn_bd"]["database"]
 
-            user=user,
+            )
+            logger.info(f"host = {host}")
+            logger.info(f"user = {user}")
+            logger.info(f"passwd = {passwd}")
+            logger.info(f"database = {database}")
 
-            passwd=passwd,
+            logger.info("Conexão com o banco de dados estabelecida com sucesso.")
 
-            database=database
-
-        )
-
-        logger.info("Conexão com o banco de dados estabelecida com sucesso.")
-
-        return conn
+            return conn
 
     except Error as e:
 
-        logger.error(f"Erro ao conectar ao banco de dados: {e}")
+            logger.error(f"Erro ao conectar ao banco de dados: {e}")
 
-        return None
+            return None
 
  
 
 # Função para obter o ID de um usuário do Telegram a partir de um ID específico no banco de dados
 
-def get_user_telegram_id(conn, specific_user_id):
+def get_user_telegram_id(conn, config):
+    logger.info("iniciando - get_user_telegram_id()")
 
     try:
 
         cursor = conn.cursor()
 
-        cursor.execute("SELECT informacoes_contato FROM contato WHERE id = %s", (specific_user_id,))
+        cursor.execute("SELECT informacoes_contato FROM contato WHERE id = %s", config["user_id"]["specific_user_id"])
 
         row = cursor.fetchone()
 
         if row:
 
-            logger.info(f"Telegram ID encontrado para o usuário {specific_user_id}: {row[0]}")
+            logger.info("Telegram ID encontrado para o usuário %s: {row[0]}", config["user_id"]["specific_user_id"])
 
             return row[0]
 
-        logger.warning(f"Usuário com ID específico {specific_user_id} não encontrado no banco de dados.")
+        logger.warning(f"Usuário com ID específico %s não encontrado no banco de dados.", config["user_id"]["specific_user_id"])
 
         return None
 
@@ -88,28 +104,32 @@ def get_user_telegram_id(conn, specific_user_id):
 
 # Função para enviar mensagem inicial e desligar o bot
 
-def enviar_mensagem_inicial_e_desligar():
+def enviar_mensagem_inicial_e_desligar(conn, config):
 
     try:
 
         # Conectar ao banco de dados
 
-        conn = mysql_connection('localhost', 'root', 'sarabi3011', 'TFG')
+        user_id = config["user_id"]["specific_user_id"]
 
+        host = config["conn_bd"]["host"]
+
+        passwd = config["conn_bd"]["passwd"]
+
+        database = config["conn_bd"]["database"]
+
+        user = config["conn_bd"]["user"]
+
+        conn = mysql_connection(host,user,passwd,database)        
+        
         if conn:
-
-            # ID específico do usuário no banco de dados
-
-            specific_user_id = 1  # Substitua pelo ID específico que você quer utilizar
-
-           
 
             # Obtém o ID do usuário do Telegram a partir do ID específico no banco de dados
 
-            user_telegram_id = get_user_telegram_id(conn, specific_user_id)
+            user_telegram_id = get_user_telegram_id(conn, config['user_id']['specific_user_id'])
+            
             print(user_telegram_id)
            
-
             if user_telegram_id:
 
                 bot = Bot(TOKEN)
@@ -140,9 +160,10 @@ def enviar_mensagem_inicial_e_desligar():
 
 def main():
 
-    # Envia mensagem inicial e desliga o bot após enviar
-
-    enviar_mensagem_inicial_e_desligar()
+    config = get_data()
+    conn = mysql_connection(config)
+        # Envia mensagem inicial e desliga o bot após enviar
+    enviar_mensagem_inicial_e_desligar(conn, config)
 
  
 
