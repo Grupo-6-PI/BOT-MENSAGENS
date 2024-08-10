@@ -50,10 +50,10 @@ def mysql_connection(config):#host, user, passwd, database=None):
                 database=config["conn_bd"]["database"]
 
             )
-            logger.info(f"host = {host}")
-            logger.info(f"user = {user}")
-            logger.info(f"passwd = {passwd}")
-            logger.info(f"database = {database}")
+            logger.info(f"host = {conn._host}")
+            logger.info(f"user = {conn._user}")
+            logger.info(f"passwd = {conn._password}")
+            logger.info(f"database = {conn._database}")
 
             logger.info("Conexão com o banco de dados estabelecida com sucesso.")
 
