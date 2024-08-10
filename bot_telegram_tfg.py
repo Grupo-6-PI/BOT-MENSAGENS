@@ -86,6 +86,7 @@ def get_user_telegram_id(conn, config):
 
             return row[0]
 
+        #Esse logger está fora do else, deveria estar assim?
         logger.warning(f"Usuário com ID específico %s não encontrado no banco de dados.", config["user_id"]["specific_user_id"])
 
         return None
@@ -108,7 +109,10 @@ def enviar_mensagem_inicial_e_desligar(conn, config):
 
     try:
 
-        # Conectar ao banco de dados
+        # # Conectar ao banco de dados
+
+        # A variavel conn já é a sua conexão com o Banco feita, 
+        # então esse passo e redundante e custoso pois fica repetindo criação de conexão sem fechar nenhuma
 
         user_id = config["user_id"]["specific_user_id"]
 
@@ -120,15 +124,16 @@ def enviar_mensagem_inicial_e_desligar(conn, config):
 
         user = config["conn_bd"]["user"]
 
+        #Para iniciar uma conexão essa função só recebe 1 parametro
+        #Nesse caso vai dar erro pois está tentando passar 4 ao mesmo tempo
         conn = mysql_connection(host,user,passwd,database)        
         
+        #Como a conexão já foi feita em outro local pode retirar esse if daqui
         if conn:
 
             # Obtém o ID do usuário do Telegram a partir do ID específico no banco de dados
 
             user_telegram_id = get_user_telegram_id(conn, config['user_id']['specific_user_id'])
-            
-            print(user_telegram_id)
            
             if user_telegram_id:
 
@@ -143,8 +148,6 @@ def enviar_mensagem_inicial_e_desligar(conn, config):
             else:
 
                 logger.warning(f"Não foi possível enviar a mensagem. ID do usuário do Telegram não encontrado.")
-
-           
 
             conn.close()
 
@@ -162,7 +165,6 @@ def main():
 
     config = get_data()
     conn = mysql_connection(config)
-        # Envia mensagem inicial e desliga o bot após enviar
     enviar_mensagem_inicial_e_desligar(conn, config)
 
  
