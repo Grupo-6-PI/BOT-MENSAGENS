@@ -2,28 +2,46 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 from mysql.connector import connect, Error
-import time
 
 def mysql_connection(host, user, passwd, database=None):
     return connect(host=host, user=user, passwd=passwd, database=database)
 
-def send_email(nome,receiverAdress):
+def send_email(*resultado):
     
+    #configurar email da mooca solidária
     email_sender = 'paulocafasso@gmail.com'
-    email_password = 'wamz uxat tmlv ixpj'
-    nome = nome
-    
-    subject = 'Pedido Mooca Solidária'
-    body = """
-        Olá, {nome}!
-        Nós da Mooca Solidária temos o prazer de dizer que está tudo pronto para você, agora é só vir buscar.
-        Caso não se lembre do endereço: RUA PADRE RAPOSO, 397 - MOOCA - SÃO PAULO - SP
-        (Por favor não responder esse e-mail)
+    #configurar senha de app na conta google a qual pertence o email a cima
+    email_password = 'wamz uxat tmlv ixpj' 
+    nome = resultado[0]
+
+    print(resultado[0])
+    print(resultado[1])
+
+    subject = 'Doação Pronta para Retirada na Mooca Solidária'
+    body = f"""
+        Olá {nome},
+
+        Esperamos que você esteja bem!
+
+        Viemos informar que a doação solicitada por você está pronta para retirada. Abaixo estão os detalhes:
+
+        Local de Retirada: RUA PADRE RAPOSO, 397 - MOOCA - SÃO PAULO - SP
+        Horário Disponível para Retirada: 9:00 - 18:00
+        Contato: +55 (11) 98081-8010
+        (Favor não responder a esse e-mail)
+        
+
+        Agradecemos pela oportunidade de contribuir e aguardamos sua visita/retirada.
+
+        Atenciosamente,
+
+        Mooca Solidária
+        instagram - moocasolidaria
     """
 
     em = EmailMessage()
     em['From'] = email_sender
-    em['To'] = receiverAdress
+    em['To'] = resultado[1]
     em['Subject'] = subject
     em.set_content(body)
 
@@ -33,7 +51,7 @@ def send_email(nome,receiverAdress):
     # Faz login e envia email
     with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
         smtp.login(email_sender, email_password)
-        smtp.sendmail(email_sender, receiverAdress, em.as_string())
+        smtp.sendmail(email_sender, resultado[1], em.as_string())
 
 def main():
     try:
@@ -51,9 +69,20 @@ def main():
             AND r.data_ultima_atualizacao >= NOW() - INTERVAL 3 HOUR;
         '''
         cursor.execute(email_query)
-        result = cursor.fetchall()
+        resultados = cursor.fetchall()
         
-        for resultado in result:
+        #TESTES MOCKADOS
+        #resultados =[ 
+        #('Aeris', 'aeris.rasmussen@sptech.school'),
+        #('Bianca', 'bianca.reis@sptech.school'),
+        #('Davi', 'davi.rsilva@sptech.school'),
+        #('Julio', 'julio.dahi@sptech.school'),
+        #('Tiago','tiago.navarro@sptech.school')
+        #]
+        
+        
+        for resultado in resultados:
+            print(resultado)
             send_email(*resultado)
            
     except Error as e:
@@ -62,7 +91,7 @@ def main():
     finally:
         if connection.is_connected():
             connection.close()
-    
-    
-    
-    # cron schedule - - > não use while true
+
+
+if __name__ == "__main__":
+    main()
