@@ -140,6 +140,7 @@ def enviar_mensagem_inicial_e_desligar(conn, config):
                 bot = Bot(TOKEN)
 
                 bot.send_message(chat_id=user_telegram_id, text='Bot iniciado. Olá! Este é o bot de avisos do Mooca Solidária.')
+                bot.send_message(chat_id=user_telegram_id, text='Para pedir cesta digite 1. Para ')
 
                 logger.info("Mensagem enviada com sucesso.")
 
