@@ -3,7 +3,12 @@ import ssl
 from email.message import EmailMessage
 from mysql.connector import connect, Error
 
-def mysql_connection(host, user, passwd, database=None):
+def mysql_connection(host, user, passwd, database):
+    print("Conectando com os seguintes parametros:")
+    print(host)
+    print(user)
+    print(passwd)
+    print(database)
     return connect(host=host, user=user, passwd=passwd, database=database)
 
 def send_email(*resultado):
@@ -20,7 +25,6 @@ def send_email(*resultado):
     subject = 'Doação Pronta para Retirada na Mooca Solidária'
     body = f"""
         Olá {nome},
-
         Esperamos que você esteja bem!
 
         Viemos informar que a doação solicitada por você está pronta para retirada. Abaixo estão os detalhes:
@@ -29,12 +33,11 @@ def send_email(*resultado):
         Horário Disponível para Retirada: 9:00 - 18:00
         Contato: +55 (11) 98081-8010
 
-        Agradecemos pela oportunidade de contribuir e aguardamos sua visita/retirada.
+        Agradecemos pela oportunidade de contribuir, aguardamos sua visita/retirada.
         (Favor não responder a esse e-mail)
         
-        Atenciosamente,
-
-        Mooca Solidária
+        Atenciosamente, Mooca Solidária
+        
         instagram - moocasolidaria
     """
 
@@ -54,19 +57,19 @@ def send_email(*resultado):
 
 def main():
     try:
-        connection = mysql_connection('localhost', 'root', 'root', 'tfg')
+        connection = mysql_connection('localhost', 'root', 'root', 'TFG')
         cursor = connection.cursor()
         
         # query escrita de forma que busque no banco os nomes e email de todos 
         # os usuários com requisições em situação concluida nas ultimas 3 horas
         email_query = '''
             SELECT u.nome, u.email
-            FROM usuario u
-            JOIN requisicoes r ON u.id = r.usuario_id
-            JOIN situacao s ON r.situacao_id = s.id
-            WHERE s.situacao = 'Concluida'
+            FROM usuario AS u
+            JOIN requisicoes AS r ON u.id = r.usuario_id
+            JOIN situacao AS s ON r.situacao_id = s.id
+            WHERE s.id = 6
             AND r.data_ultima_atualizacao >= NOW() - INTERVAL 3 HOUR;
-        '''
+            '''
         cursor.execute(email_query)
         resultados = cursor.fetchall()
         
@@ -79,11 +82,10 @@ def main():
         #('Tiago','tiago.navarro@sptech.school')
         #]
         
-        
         for resultado in resultados:
             print(resultado)
             send_email(*resultado)
-           
+          
     except Error as e:
         print(f"Erro de conexão: {e}")
         
@@ -92,5 +94,4 @@ def main():
             connection.close()
 
 
-if __name__ == "__main__":
-    main()
+main()
