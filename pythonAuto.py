@@ -28,11 +28,10 @@ def send_email(*resultado):
         Local de Retirada: RUA PADRE RAPOSO, 397 - MOOCA - SÃO PAULO - SP
         Horário Disponível para Retirada: 9:00 - 18:00
         Contato: +55 (11) 98081-8010
-        (Favor não responder a esse e-mail)
-        
 
         Agradecemos pela oportunidade de contribuir e aguardamos sua visita/retirada.
-
+        (Favor não responder a esse e-mail)
+        
         Atenciosamente,
 
         Mooca Solidária
