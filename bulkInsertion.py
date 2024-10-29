@@ -67,7 +67,7 @@ while continua:
     else:
         arquivos.append(nome)
 
-url_backend = 'http://localhost:8080/usuarios/completo/cadastro/massa'  # URL backend
+url_backend = 'https://daring-bat-mostly.ngrok-free.app/usuarios/completo/cadastro/massa'  # URL backend
 
 for arquivo in arquivos:
     json_result = excel_to_json(arquivo)
