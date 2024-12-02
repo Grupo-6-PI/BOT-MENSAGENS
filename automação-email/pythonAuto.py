@@ -14,9 +14,9 @@ def mysql_connection(host, user, passwd, database):
 def send_email(*resultado):
     
     #configurar email da mooca solidária
-    email_sender = 'paulocafasso@gmail.com'
+    email_sender = 'contato@moocasolidaria.com.br'
     #configurar senha de app na conta google a qual pertence o email a cima
-    email_password = 'wamz uxat tmlv ixpj' 
+    email_password = '' 
     nome = resultado[0]
 
     print(resultado[0])
@@ -29,7 +29,8 @@ def send_email(*resultado):
 
         Viemos informar que a doação solicitada por você está pronta para retirada. Abaixo estão os detalhes:
 
-        Local de Retirada: RUA PADRE RAPOSO, 397 - MOOCA - SÃO PAULO - SP
+        Local de Retirada: 
+        RUA MAJOR BASÍLICO, 644 - MOOCA - SÃO PAULO - SP
         Horário Disponível para Retirada: 9:00 - 18:00
         Contato: +55 (11) 98081-8010
 
